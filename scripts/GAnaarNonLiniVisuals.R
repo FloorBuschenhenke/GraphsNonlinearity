@@ -1,6 +1,6 @@
 # van general analysis file naar visuals van nonlineariteit
 
-# kleine gittest.. 
+
 
 ########### alles bij elkaar in 1 script
 
@@ -186,7 +186,7 @@ data_add$charProduction[data_add$charProduction == 0] <- NA
 
 #head(data_add)
 
-write.csv(data_add, "data_add_zonderpauzes.csv", row.names = F)
+write.csv(data_add, "data_out/data_add_zonderpauzes.csv", row.names = F)
 
 
 ##########------------ summarize jump events --------------------------#######
@@ -208,7 +208,7 @@ jump_add <- data_add %>%
 
 
 
-write.csv(jump_add, "jump_add_zonderpauzes.csv", row.names = F)
+write.csv(jump_add, "data_out/jump_add_zonderpauzes.csv", row.names = F)
 
 
 ####################### 3. plaatjes maken ###################################################
@@ -219,12 +219,12 @@ write.csv(jump_add, "jump_add_zonderpauzes.csv", row.names = F)
 
 
 
-jumptabel <- read.csv("jump_add_zonderpauzes.csv", stringsAsFactors = F)
+jumptabel <- read.csv("data_out/jump_add_zonderpauzes.csv", stringsAsFactors = F)
 
-data_add <- read.csv("data_add_zonderpauzes.csv", stringsAsFactors = F)
+data_add <- read.csv("data_out/data_add_zonderpauzes.csv", stringsAsFactors = F)
 
-colnames(jumptabel)
-colnames(data_add)
+#colnames(jumptabel)
+#colnames(data_add)
 
 ##############
 
@@ -275,12 +275,29 @@ write.csv(grotetabel, "data_out/grotetabel.csv", row.names = F)
 
 ## welke activiteiten vinden wanneer plaats? perspectief: sessie (ook vergelijken met paar sessies)
 
-grotetabel <- read.scv("data_out/grotetabel.csv", stringsAsFactors = F) 
+grotetabel <- read.csv("data_out/grotetabel.csv", stringsAsFactors = F) 
 
 ## grote tabel is output van de nonlineariteitsanalyse 
 
+## hier moeten nog chrononummers naast de sessie(idfx)nummers komen ##
+
+summaryTekst <- read.csv("data/summaryTekst.csv", stringsAsFactors = F)
+
+
+chrononummers <- summaryTekst %>%
+   group_by(participant, session_number)%>%
+  select(participant, session_number, chrononumber)
+
+#view(chrononummers)
+
+grotetabel2 <- grotetabel %>%
+  group_by(participant, session_number)%>%
+  left_join(chrononummers)
+
+  
+ 
 ## de max jump size beinvloed de lees/werkbaarheid vd graphs
-grotetabelzonderoutliers <- grotetabel %>%
+grotetabelzonderoutliers <- grotetabel2 %>%
   filter(jump_size_charsPlus < 2000)%>%
   mutate( jump_type = ifelse(jump_type == "insert", "selection", jump_type))%>%
   rename( event_type = jump_type)%>%
@@ -297,14 +314,19 @@ library(firatheme)
 
 ##voor proces emilia
 actiegraphemilia <- grotetabelzonderoutliers %>%
-  filter(participant == 'Emilia', session_number < 4, event_type != 'jump')
+  filter(participant == 'Emilia', chrononumber == 5, event_type != 'jump')
  # filter(participant == 'Emilia', session_number < 3, event_type != 'jump')
 
-ActiePlotEm <- ggplot(actiegraphemilia, aes(jump_number, jump_size_charsPlus))
-ActiePlotEm + geom_point(aes(jump_number, jump_size_charsPlus, colour = event_type))+
-  labs(x = "event_number", y = "size in characters", title = "activities per session", subtitle = "Emilia's process")+
-  facet_grid(cols = vars(session_number))+ theme_fira()+scale_color_fira()
+#colnames(actiegraphemilia)
 
+ActiePlotEm <- ggplot(actiegraphemilia, aes(jump_number, jump_size_charsPlus))
+Plot2 <- ActiePlotEm + geom_point(aes(jump_number, jump_size_charsPlus, colour = event_type))+
+  labs(x = "actions", y = "size in characters", title = "activities per session", subtitle = "Emilia's process")+
+  facet_grid(cols = vars(chrononumber))+ 
+  theme_fira()+scale_color_fira()
+
+Plot2
+Plot2 + theme(axis.text.x = element_blank())
 
 ### ok, de jumps maken het lastig om de andere acties goed te kunnen zien - zijn veel 'kleiner
 
