@@ -1,0 +1,63 @@
+---
+title: "Nonlini visuals - Companion"
+author: "Floor"
+date: "27-1-2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## 
+### 3 verschillende grafieken om de nonlineariteit in beeld te brengen
+
+# verdeling van jumps? (1 var) per sessie / over hele proc
+
+# activiteiten per sessie 
+
+# bewegingen per sessie (process graphs)
+- Per sessie
+- per schrijfproces
+
+grotetabel <- "data_out/grotetabel.csv" uit episodevinderR (jumpevents_episodes script)
+## grote tabel is output van de nonlineariteitsanalyse 
+## deze hiero mooi maken voor Companion en rest ;)
+grotetabelzonderoutliers <- grotetabel %>%
+  filter(jump_size_charsPlus < 200)%>%
+  mutate( jump_type = ifelse(jump_type == "insert", "selection", jump_type))%>%
+  rename( event_type = jump_type)%>%
+  filter(!(event_type == "jump" & jump_size_charsPlus == 0))
+
+# rename ook      distance_in_chars_plus = jump_size_charsPlus,
+#      event_number = jump_number)
+
+event_type_graph_minoutliers <- ggplot(grotetabelzonderoutliers, aes(jump_number, jump_size_charsPlus))
+event_type_graph_minoutliers + geom_point(aes(jump_number, jump_size_charsPlus, colour = event_type))+
+  labs(x = "event_number", y = "size in characters", title = "activities per session", subtitle = "sample set De Hemel")+
+  facet_grid(cols = vars(session_number))+ theme_fivethirtyeight()
+
+# theme_fivethirtyeight()  ook leuk
+
+# theme_few() mooi minimal
+# theme_bw(base_family = "Playfair")
+# theme_economist()
+#  theme_solarized()
+# theme_stata()
+
+## geeft wel een goed beeld van de verhouding tussen de activiteiten 
+# komt overeen met hoe ik de GA lees (en process graphs interpreteer)
+
+```{r cars}
+summary(cars)
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
