@@ -190,6 +190,11 @@ write.csv(data_add, "data_out/data_add_zonderpauzes.csv", row.names = F)
 
 
 ##########------------ summarize jump events --------------------------#######
+
+
+
+
+
 # summary statistics for each jump event
 jump_add <- data_add %>%
   group_by(participant, session_number, jump_number) %>%
@@ -209,6 +214,14 @@ jump_add <- data_add %>%
 
 
 write.csv(jump_add, "data_out/jump_add_zonderpauzes.csv", row.names = F)
+
+
+
+
+
+
+
+
 
 
 ####################### 3. plaatjes maken ###################################################
@@ -270,6 +283,20 @@ grotetabel <- data_add %>%
 # write data to file
 write.csv(grotetabel, "data_out/grotetabel.csv", row.names = F)
 
+########## 7 juni: toevoeging duration voor focus events #######
+
+grotetabel <- read.csv("data_out/grotetabel.csv", stringsAsFactors = F)
+
+grotetabelFocusduur <- grotetabel %>%
+  #oefenen met 1 sessie
+  filter(participant == "De Hemel", session_number == 2)
+
+view(grotetabelFocusduur)
+
+
+
+
+
 
 ############################ plaatje maken ################################################
 
@@ -306,9 +333,10 @@ grotetabelzonderoutliers <- grotetabel2 %>%
 # rename ook   evt   distance_in_chars_plus = jump_size_charsPlus,
 #      event_number = jump_number) nu in assen-labels gedaan omdat andere scripts ook met deze variabelen werken
 
+write.csv(grotetabelzonderoutliers, "grotetabelzonderoutliers.csv")
 
 ### activities per session ### 
-
+library(tidyverse)
 library(firatheme)
 #library(tidyverse)
 
@@ -317,10 +345,10 @@ actiegraphemilia <- grotetabelzonderoutliers %>%
   filter(participant == 'Emilia', chrononumber == 5, event_type != 'jump')
  # filter(participant == 'Emilia', session_number < 3, event_type != 'jump')
 
-#colnames(actiegraphemilia)
+#names(actiegraphemilia)
 
 ActiePlotEm <- ggplot(actiegraphemilia, aes(jump_number, jump_size_charsPlus))
-Plot2 <- ActiePlotEm + geom_point(aes(jump_number, jump_size_charsPlus, colour = event_type))+
+Plot2 <- ActiePlotEm + geom_point(aes(jump_number, jump_size_charsPlus, colour = event_type), size = 2)+
   labs(x = "actions", y = "size in characters", title = "activities per session", subtitle = "Emilia's process")+
   facet_grid(cols = vars(chrononumber))+ 
   theme_fira()+scale_color_fira()
