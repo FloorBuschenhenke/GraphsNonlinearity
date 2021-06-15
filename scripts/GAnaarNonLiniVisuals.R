@@ -321,7 +321,7 @@ grotetabel2 <- grotetabel %>%
   group_by(participant, session_number)%>%
   left_join(chrononummers)
 
-  
+ write.csv(grotetabel2, "grotetabel2.csv", row.names = F) 
  
 ## de max jump size beinvloed de lees/werkbaarheid vd graphs
 grotetabelzonderoutliers <- grotetabel2 %>%

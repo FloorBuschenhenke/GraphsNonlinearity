@@ -21,6 +21,10 @@ Emiliaalles2 <- Emiliaalles %>%
   left_join(chrononumEmilia, by= "session_number")
 
 
+write.csv(Emiliaalles2, "emiliaprocessgraphshiny.csv", row.names = F)
+
+
+
 # view(Emiliaalles2)
 ## ok, dan optellende holistische event_eindtijden toevoegen
 
