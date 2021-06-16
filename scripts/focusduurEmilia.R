@@ -1,6 +1,6 @@
 ## duration plaatjes maken - materiaal Emilia
 
-# op basis van haycho's pythonscript focusduur berekend
+# op basis van hayco's pythonscript focusduur berekend
 
 
 
@@ -108,4 +108,63 @@ ggdotchart(ActiePlotEm3, x = "jump_number", y = "event_duration",
 
 
 # Sort value in descending order
-# sorting = "ascending",  
+# sorting = "ascending", 
+
+#####timeline graph####
+library(vistime)
+
+names(actiegraphemilia)
+vistime(actiegraphemilia, 
+        col.event = "event_type", 
+        col.start = "start_time",
+        col.end = "end_time")
+   
+### helaas... not of class 'POSIXct'    
+  ### https://stackoverflow.com/questions/48426873/r-timeline-without-dates
+## https://cran.r-project.org/web/packages/vistime/vignettes/vistime-vignette.html
+     
+
+## eerst starttime en endtime omzetten dus 
+ms <- 1243000042234
+ms_to_date = function(ms, t0="2020-12-08", timezone) {
+  ## @ms: a numeric vector of milliseconds (big integers of 13 digits)
+  ## @t0: a string of the format "yyyy-mm-dd", specifying the date that
+  ##      corresponds to 0 millisecond
+  ## @timezone: a string specifying a timezone that can be recognized by R
+  ## return: a POSIXct vector representing calendar dates and times        
+  sec = ms / 1000
+  as.POSIXct(sec, origin=t0, tz=timezone)
+}     
+
+actiongraphemiliaPosix <- actiegraphemilia %>%
+  mutate(starttimePosix = ms_to_date(start_time, timezone = "Europe/Amsterdam"),
+         endtimePosix = ms_to_date(end_time, timezone = "Europe/Amsterdam"))
+
+view(actiongraphemiliaPosix)
+
+
+#####timeline graph####
+library(vistime)
+
+names(actiongraphemiliaPosix)
+vistime(actiongraphemiliaPosix, 
+        col.event = "event_type", 
+        col.start = "starttimePosix",
+        col.end = "endtimePosix")
+
+## kleiner fragment van de sessie nemen, dit werkt op zich maar is lelijk
+# nl onleesbare naamlabels per event
+
+## met kleiner stukje sessie, deze voor artikel ####
+
+actiongraphemiliafragmentje <- actiongraphemiliaPosix %>%
+slice_head(n = 75)
+
+vistime(actiongraphemiliafragmentje, 
+        col.event = "event_type", 
+        col.start = "starttimePosix",
+        col.end = "endtimePosix",
+        title = "Emilia's 5th session - first 75 actions - interactive timeline",
+        show_labels = F)
+
+#labels = per event. staan niet zo mooooi
